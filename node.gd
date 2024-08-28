@@ -1,14 +1,24 @@
 extends Node
 
 func _ready() -> void:
-	var arguments = {}
-	for argument in OS.get_cmdline_args():
-		if argument.contains("="):
-			var key_value = argument.split("=")
-			arguments[key_value[0].trim_prefix("--")] = key_value[1]
-		else:
-			# Options without an argument will be present in the dictionary,
-			# with the value set to an empty string.
-			arguments[argument.trim_prefix("--")] = ""
-	print(arguments)
-	get_tree().quit(0)
+	var arguments = OS.get_cmdline_args()
+
+	var target = ""
+	var path = ""
+	var dir_mode = true
+
+	if arguments.size() > 0:
+		target = arguments[0]
+	else:
+		print("Invalid Arguments")
+		get_tree().quit(1)
+
+	if arguments.size() > 1:
+		dir_mode = false
+		path = arguments[1]
+
+	if !dir_mode:
+		var file = FileAccess.open(path, FileAccess.READ)
+		var words = file.get_as_text()
+		if words.contains(target):
+			print("Found ", target, " at ", words.find(target))
